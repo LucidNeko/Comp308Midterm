@@ -534,7 +534,28 @@ int main(int argc, char **argv) {
 	g_skeleton = new Skeleton(argv[1]);
 
 	if(argc == 3) {
-		g_skeleton->readAMC(argv[2]);
+		// g_skeleton->readAMC(argv[2]);
+
+		ifstream file(argv[2]);
+
+		if (!file.is_open()) {
+			cerr << "Failed to open file " <<  filename << endl;
+			throw runtime_error("Error :: could not open file.");
+		}
+
+		cout << "Reading file" << filename << endl;
+
+		// good() means that failbit, badbit and eofbit are all not set
+		while (file.good()) {
+
+			// Pull out line from file
+			string line = nextLineTrimmed(file);
+
+			cout << line << endl;
+
+		}
+
+		cout << "Completed reading file" << filename << endl;
 	}
 
 
