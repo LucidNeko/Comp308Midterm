@@ -1,0 +1,1 @@
+/bin/c++      CMakeFiles/a2.dir/main.cpp.o CMakeFiles/a2.dir/skeleton.cpp.o CMakeFiles/a2.dir/spline.cpp.o CMakeFiles/a2.dir/control.cpp.o  -o ../bin/a2 -rdynamic /lib64/libglut.so ../bin/libglew.a /lib64/libXmu.so /lib64/libXi.so -lGLU -lGL -lGLU -lGL 

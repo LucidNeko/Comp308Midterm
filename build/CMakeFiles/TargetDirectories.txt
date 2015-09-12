@@ -1,0 +1,2 @@
+/u/students/raehodhami/Comp308/midProject_stage2/build/src/CMakeFiles/a2.dir
+/u/students/raehodhami/Comp308/midProject_stage2/build/ext/glew-1.10.0/CMakeFiles/glew.dir
