@@ -265,7 +265,11 @@ void draw() {
 
 	float sum = v.x + v.y;
 	if(sum == sum) { //checknan
-		g_skeleton->setPosition(v.x, v.y, v.z);
+		// if(g_control->getSplinePath()->size() >= 2) {
+		// 	g_skeleton->setPosition(v.x, v.y, v.z);
+		// } else {
+			g_skeleton->lerpPosition(v.x, v.y, v.z);
+		// }
 	}
 
 	// float mod_t2 = g_control->modWithSpeed(t+0.01f);

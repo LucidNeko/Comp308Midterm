@@ -222,7 +222,7 @@ Spline* Control::projectOnXZPlane() {
 	m_splinePath->getNormalizedSpline(*s);
 	for(int i = 0; i < s->size(); i++) {
 		vec3 v = s->getControlPoint(i);
-		out->addPoint(vec3(v.x, 0.f, -v.y));
+		out->addPoint(vec3(v.x*2, 0.f, -v.y*2)); //*2 scale
 	}
 	delete s;
 	return out;

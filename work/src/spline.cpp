@@ -39,6 +39,10 @@ void Spline::addPoint(const vec3 &v) {
 	dt = float(1) / float(points.size()-1);
 
 	rebuildTable();
+
+	// for(int i = 0; i < m_conversionTable.size(); i++) {
+	// 	cout << "u:" << m_conversionTable[i].u << "s:" << m_conversionTable[i].s << endl;
+	// }
 }
 
 void Spline::rebuildTable() {

@@ -92,7 +92,8 @@ void Skeleton::renderSkeleton() {
 		if(m_applyRootMotion) {
 			trans = m_position;
 		} else {
-			trans = m_bones[0].translation;	
+			// trans = m_bones[0].translation;	
+			trans = m_bones[0].xf.p + m_bones[0].translation;	
 		} 
 		glTranslatef(trans.x, trans.y, trans.z);
 
@@ -185,9 +186,12 @@ void Skeleton::renderBone(bone *b, GLUquadric* q) {
 		renderGimbal(q, r, b->hl);
 
 		//rotation
-		glRotatef(b->rotation.z, 0.f, 0.f, 1.f);
-		glRotatef(b->rotation.y, 0.f, 1.f, 0.f);
-		glRotatef(b->rotation.x, 1.f, 0.f, 0.f);
+		glRotatef(b->xf.r.z + b->rotation.z, 0.f, 0.f, 1.f);
+		glRotatef(b->xf.r.y + b->rotation.y, 0.f, 1.f, 0.f);
+		glRotatef(b->xf.r.x + b->rotation.x, 1.f, 0.f, 0.f);
+		// glRotatef(b->rotation.z, 0.f, 0.f, 1.f);
+		// glRotatef(b->rotation.y, 0.f, 1.f, 0.f);
+		// glRotatef(b->rotation.x, 1.f, 0.f, 0.f);
 
 		//inverse basis
 		glRotatef(-b->basisRot.x, 1.f, 0.f, 0.f);
@@ -916,9 +920,9 @@ void Skeleton::renderFrame(frame *f) {
 
 		if(b->freedom & dof_root) {
 			//assume 6 values;
-			b->translation.x = values[0];// * m_scaleFactor;
-			b->translation.y = values[1];// * m_scaleFactor;
-			b->translation.z = values[2];// * m_scaleFactor;
+			// b->translation.x = values[0];// * m_scaleFactor;
+			// b->translation.y = values[1];// * m_scaleFactor;
+			// b->translation.z = values[2];// * m_scaleFactor;
 			//inches to meters
 			b->translation *= ((1.0f/0.45f)*2.54f/100.0f);
 

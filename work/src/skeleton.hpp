@@ -49,6 +49,11 @@ struct highlight {
 	bool z = false;
 };
 
+struct transform {
+	comp308::vec3 p; //position
+	comp308::vec3 r; //rotation
+};
+
 // Type to represent a bone
 struct bone {
 	std::string name;
@@ -65,6 +70,8 @@ struct bone {
 	comp308::vec3 translation;    // Translation (Only for the Root)
 	comp308::vec3 rotation_max;   // Maximum value for rotation for this joint (degrees)
 	comp308::vec3 rotation_min;   // Minimum value for rotation for this joint (degrees)
+
+	transform xf;
 
 	uint id;
 	bool selected = false;
@@ -252,24 +259,79 @@ public:
 	}
 
 	void setPosition(float x, float y, float z) {
-		(&m_bones[findBone("root")])->translation = comp308::vec3(x, y, z);
+		(&m_bones[findBone("root")])->xf.p = comp308::vec3(x, y, z);
+	}
+
+	void lerpPosition(float x, float y, float z) {
+		float t = 0.1f;
+		comp308::vec3 a = (&m_bones[findBone("root")])->xf.p;
+		comp308::vec3 b = comp308::vec3(x, y, z);
+
+		(&m_bones[findBone("root")])->xf.p = 
+		   comp308::vec3((1-t)*a.x + t*b.x, 
+				    	 (1-t)*a.y + t*b.y, 
+						 (1-t)*a.z + t*b.z);
 	}
 
 	void lookAt(comp308::vec3 look) {
 
 
-		comp308::vec3 pos = (&m_bones[findBone("root")])->translation;
+		comp308::vec3 pos = (&m_bones[findBone("root")])->xf.p;
+
+		// std::cout << look << " -> " << pos << std::endl;
 
 		if(look.x == pos.x && look.y == pos.y && look.z == pos.z) {
 			return;
 		}
 
 		comp308::vec3 diff = look-pos; diff.y = 0; //XZ plane
+		if(length(diff) == 0) { diff.z = 1; }
 		comp308::vec3 dir = normalize(diff);
 		comp308::vec3 zvec = comp308::vec3(0,0,1);
 		float angle = acos(dot(zvec, dir)/(length(dir)*length(zvec)));
 		angle = comp308::degrees(angle);
-		std::cout << dir.x << " " << angle << std::endl;
-		(&m_bones[findBone("root")])->rotation.y = dir.x < 0 ? -angle : angle;
+		// std::cout << dir.x << " " << angle << std::endl;
+		//because dot does 180deg angles. x (our tangent) can
+		//define the side, so we can flip the angle based on x
+		(&m_bones[findBone("root")])->xf.r.y = dir.x < 0 ? -angle : angle;
 	}
+
+	// void setPosition(float x, float y, float z) {
+	// 	(&m_bones[findBone("root")])->translation = comp308::vec3(x, y, z);
+	// }
+
+	// void lerpPosition(float x, float y, float z) {
+	// 	float t = 0.1f;
+	// 	comp308::vec3 a = (&m_bones[findBone("root")])->translation;
+	// 	comp308::vec3 b = comp308::vec3(x, y, z);
+
+	// 	(&m_bones[findBone("root")])->translation = 
+	// 	   comp308::vec3((1-t)*a.x + t*b.x, 
+	// 			    	 (1-t)*a.y + t*b.y, 
+	// 					 (1-t)*a.z + t*b.z);
+	// }
+
+	// void lookAt(comp308::vec3 look) {
+
+
+	// 	comp308::vec3 pos = (&m_bones[findBone("root")])->translation;
+
+
+	// 	// std::cout << look << " -> " << pos << std::endl;
+
+	// 	if(look.x == pos.x && look.y == pos.y && look.z == pos.z) {
+	// 		return;
+	// 	}
+
+	// 	comp308::vec3 diff = look-pos; diff.y = 0; //XZ plane
+	// 	if(length(diff) == 0) { diff.z = 1; }
+	// 	comp308::vec3 dir = normalize(diff);
+	// 	comp308::vec3 zvec = comp308::vec3(0,0,1);
+	// 	float angle = acos(dot(zvec, dir)/(length(dir)*length(zvec)));
+	// 	angle = comp308::degrees(angle);
+	// 	// std::cout << dir.x << " " << angle << std::endl;
+	// 	//because dot does 180deg angles. x (our tangent) can
+	// 	//define the side, so we can flip the angle based on x
+	// 	(&m_bones[findBone("root")])->rotation.y = dir.x < 0 ? -angle : angle;
+	// }
 };
