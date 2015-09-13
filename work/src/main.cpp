@@ -548,7 +548,6 @@ void mouseCallback(int button, int state, int x, int y) {
 				break;
 		}
 		if(g_fovy > 160) { g_fovy = 160; }
-		cout << g_fovy << endl;
 	}
 }
 
