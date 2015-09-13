@@ -96,6 +96,12 @@ private:
 
 	bool m_applyRootMotion = false;
 
+	//tick
+	float m_delta = 0;
+	float m_frameLength = 1.f;
+	bool m_reverse = false;
+
+
 	// Helper method
 	int findBone(std::string);
 	
@@ -118,6 +124,7 @@ public:
 	Skeleton(std::string);
 	void renderSkeleton();
 	void readAMC(std::string);
+	void readConfig(std::string);
 
 	//poses
 	void displayFrame(uint);
@@ -218,29 +225,33 @@ public:
 
 		if(h.x) {
 			m_bones[m_selectedBone].rotation.x += delta;
-			if(m_bones[m_selectedBone].rotation.x >= 360) {
-				m_bones[m_selectedBone].rotation.x = 0;
-			} else if(m_bones[m_selectedBone].rotation.x < 0) {
-				m_bones[m_selectedBone].rotation.x += 360;
-			}
+			// if(m_bones[m_selectedBone].rotation.x >= 360) {
+			// 	m_bones[m_selectedBone].rotation.x = 0;
+			// } else if(m_bones[m_selectedBone].rotation.x < 0) {
+			// 	m_bones[m_selectedBone].rotation.x += 360;
+			// }
 		} else if(h.y) {
 			m_bones[m_selectedBone].rotation.y += delta;
-			if(m_bones[m_selectedBone].rotation.y >= 360) {
-				m_bones[m_selectedBone].rotation.y = 0;
-			} else if(m_bones[m_selectedBone].rotation.y < 0) {
-				m_bones[m_selectedBone].rotation.y += 360;
-			}
+			// if(m_bones[m_selectedBone].rotation.y >= 360) {
+			// 	m_bones[m_selectedBone].rotation.y = 0;
+			// } else if(m_bones[m_selectedBone].rotation.y < 0) {
+			// 	m_bones[m_selectedBone].rotation.y += 360;
+			// }
 		} else if(h.z) {
 			m_bones[m_selectedBone].rotation.z += delta;
-			if(m_bones[m_selectedBone].rotation.z >= 360) {
-				m_bones[m_selectedBone].rotation.z = 0;
-			} else if(m_bones[m_selectedBone].rotation.z < 0) {
-				m_bones[m_selectedBone].rotation.z += 360;
-			}
+			// if(m_bones[m_selectedBone].rotation.z >= 360) {
+			// 	m_bones[m_selectedBone].rotation.z = 0;
+			// } else if(m_bones[m_selectedBone].rotation.z < 0) {
+			// 	m_bones[m_selectedBone].rotation.z += 360;
+			// }
 		} 
 	}
 
 	std::vector<bone> getBones() {
 		return m_bones;
+	}
+
+	void setPosition(float x, float y, float z) {
+		(&m_bones[findBone("root")])->translation = comp308::vec3(x, y, z);
 	}
 };

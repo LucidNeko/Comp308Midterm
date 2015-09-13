@@ -1,5 +1,0 @@
-sitting.amc
-standing.amc
-walking.amc
-standimg.amc
-matrix.amc

@@ -66,21 +66,21 @@ void Skeleton::renderSkeleton() {
 	glBegin(GL_LINES);
 		//x
 		glColor3f(1.0f, 0.0f, 0.0f);
-		for(uint i = 0; i < 100; i++) {
+		for(uint i = 0; i < 1; i++) {
 			glVertex3f(0.0f, 0.0f, float(i));
 			glVertex3f(100.0f, 0.0f, float(i));
 		}
 
 		//y
 		glColor3f(0.0f, 1.0f, 0.0f);
-		for(uint i = 0; i < 100; i++) {
+		for(uint i = 0; i < 1; i++) {
 			glVertex3f(float(i), 0.0f, 0.0f);
 			glVertex3f(float(i), 100.0f, 0.0f);
 		}
 
 		//z
 		glColor3f(0.0f, 0.0f, 1.0f);
-		for(uint i = 0; i < 100; i++) {
+		for(uint i = 0; i < 1; i++) {
 			glVertex3f(0.0f, float(i), 0.0f);
 			glVertex3f(0.0f, float(i), 100.0f);
 		}
@@ -345,11 +345,11 @@ void Skeleton::readASF(string filename) {
 	}
 
 	cout << "Completed reading skeleton file" << endl;
-	cout << "bone ids" << endl;
+	// cout << "bone ids" << endl;
 
-	for(uint i = 0; i < m_bones.size(); i++) {
-		cout << m_bones[i].id << endl;
-	}
+	// for(uint i = 0; i < m_bones.size(); i++) {
+	// 	cout << m_bones[i].id << endl;
+	// }
 }
 
 
@@ -666,6 +666,56 @@ string Skeleton::readFrame(string name, ifstream &file) {
 	return line;
 }
 
+void Skeleton::readConfig(string fname) {
+	ifstream file(fname);
+
+	if (!file.is_open()) {
+		cerr << "Failed to open file " <<  fname << endl;
+		// throw runtime_error("Error :: could not open file.");
+		return; //exit if can't load
+	}
+
+	//wipe previous frames
+	m_frames.clear();
+	m_frame = 0;
+	m_position = vec3(0,0,0);
+	m_applyRootMotion = false;
+
+	cout << "Reading file" << fname << endl;
+
+	int i = 0;
+
+	// good() means that failbit, badbit and eofbit are all not set
+	while (file.good()) {
+
+		string frameName = nextLineTrimmed(file);
+
+		ifstream frameStream(frameName);
+
+		if (!frameStream.is_open()) {
+			cerr << "Failed to open file " <<  frameName << endl;
+			// throw runtime_error("Error :: could not open file.");
+			return; //exit if can't load
+		} else {
+			cout << "Reading frame " << frameName << endl;
+		}
+
+		string line = nextLineTrimmed(frameStream);
+
+		// if(!isNumber(line)) {
+		// 	cout << "Expected a frame number. Got: " << line << endl;
+		// 	continue;
+		// }
+
+		readFrame(to_string(i), frameStream);
+
+		i++;
+	}
+
+	cout << "Frames read: " << i << endl;
+	cout << "Completed reading config file" << endl;
+}
+
 /*********
  * Poses *
  *********/
@@ -681,15 +731,14 @@ bool Skeleton::hasAnimation() {
 
 void Skeleton::resetAnimation() {
 	m_frame = 0;
+	m_delta = 0;
 	displayFrame(m_frame);
 }
 
-float m_delta = 0;
-float m_frameLength = 1.f;
-int m_times = 0;
-bool m_reverse = false;
-
 void Skeleton::tick(float delta) {
+	if(m_frames.size() == 0) {
+		return; //no frames
+	}
 
 	//1-m_delta to get delta going from b to a
 	bool reverse = false;
@@ -705,17 +754,16 @@ void Skeleton::tick(float delta) {
 		m_delta = 1-m_delta;
 	}
 
-	if(m_times == 1) {
-		delta = delta*8;
-	}
-
 	m_delta += delta;
 	if(m_delta >= m_frameLength) {
 		m_delta = 1.f;
 	}
 
-	frame *f0 = &m_frames[m_frame == 0 ? m_frames.size()-1 : m_frame-1];
-	frame *f1 = &m_frames[m_frame];
+	// frame *f0 = &m_frames[m_frame == 0 ? m_frames.size()-1 : m_frame-1];
+	// frame *f1 = &m_frames[m_frame];
+
+	frame *f0 = &m_frames[m_frame];
+	frame *f1 = &m_frames[(m_frame+1) % m_frames.size()];
 
 	frame f;
 	f.name = f0->name;
@@ -730,10 +778,6 @@ void Skeleton::tick(float delta) {
 			f0_v = f1_v;
 			f1_v = tmp;
 		}
-
-		if(m_times != 0) { f0_v = f1_v; }
-
-
 		
 		f.names.push_back(f0_name);
 
@@ -749,19 +793,14 @@ void Skeleton::tick(float delta) {
 	renderFrame(&f);
 
 	if(m_delta == 1.f) {
-		if(m_times == 1) {
-			m_times = 0;
-			if(reverse) {
-				if(m_frame > 0) {
-					m_frame = m_frame-1;
-				} else {
-					m_frame = m_frames.size()-1;
-				}
+		if(reverse) {
+			if(m_frame > 0) {
+				m_frame = m_frame-1;
 			} else {
-				m_frame = (m_frame+1) % m_frames.size();
+				m_frame = m_frames.size()-1;
 			}
 		} else {
-			m_times++;
+			m_frame = (m_frame+1) % m_frames.size();
 		}
 		m_delta = 0.f;	
 	}
@@ -785,7 +824,7 @@ void Skeleton::tick(float delta) {
 }
 
 void Skeleton::dumpCurrentFrame(string fname) {
-	ofstream file(fname, fstream::app);
+	ofstream file(fname); //, fstream::app);
 	if(!file.is_open()) {
 		cout << "Couldn't create " << fname << endl;
 	} else {
@@ -821,37 +860,46 @@ void Skeleton::writeBone(ofstream *file, bone *b) {
 	vec3 t = b->translation;
 	vec3 r = b->rotation;
 
-	(*file) << b->name;
+	cout << b->name << " " << int(b->freedom)<<  " " << int(dof_none) << endl;
 
-	if(b->freedom & dof_root) {
-		(*file) << " " << t.x << " " << t.y << " " << t.z <<
-				   " " << r.x << " " << r.y << " " << r.z << endl;
+	if(b->freedom == int(dof_none)) {
+		//don't write
+		cout << " not writing" << endl;
 	} else {
-		bool wrote = false;
-		if(b->freedom & dof_rx) {
-			(*file) << " " << r.x;
-			wrote = true;
-		}
+		(*file) << b->name;
 
-		if(b->freedom & dof_ry) {
-			(*file) << " " << r.y;
-			wrote = true;
-		}
+		if(b->freedom & dof_root) {
+			(*file) << " " << t.x << " " << t.y << " " << t.z <<
+					   " " << r.x << " " << r.y << " " << r.z;
+		} else {
+			if(b->freedom & dof_rx) {
+				(*file) << " " << r.x;
+			}
 
-		if(b->freedom & dof_rz) {
-			(*file) << " " << r.z;
-			wrote = true;
-		}
+			if(b->freedom & dof_ry) {
+				(*file) << " " << r.y;
+			}
 
-		if(wrote) {
-			(*file) << endl;
-		}
-	}	
+			if(b->freedom & dof_rz) {
+				(*file) << " " << r.z;
+			}
+		}	
+
+		(*file) << endl;
+	}
 
 	//write children
-	for(uint i = 0; i < b->children.size(); i++) {
-		writeBone(file, b->children[i]);
-	}
+	// if(b->freedom & dof_root) {
+		// if(b->children.size() != 0) {
+		// 	for(int i = b->children.size()-1; i >= 0 ; i--) {
+		// 		writeBone(file, b->children[i]);
+		// 	}
+		// }
+	// } else {
+		for(uint i = 0; i < b->children.size(); i++) {
+			writeBone(file, b->children[i]);
+		}
+	// }
 }
 
 void Skeleton::displayFrame(uint i) {

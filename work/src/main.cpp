@@ -66,6 +66,7 @@ enum MENU {
 	STOP = 2,
 	REWIND = 4,
 	FAST_FORWARD = 8,
+	FAST_REWIND = 16,
 };
 
 MENU g_menuState = STOP;
@@ -231,7 +232,21 @@ void draw() {
 		case FAST_FORWARD : 
 			g_skeleton->tick(0.048f);	
 			break;
+		case FAST_REWIND : 
+			g_skeleton->tick(-0.048f);	
+			break;
 	}
+
+	float t = g_time/g_endTime;
+	if(t > 1) {
+		t = 1;
+		g_time = 0;
+	}
+	g_time += 0.01f;
+
+
+	// g_skeleton->setPosition(t*2,t*2,t*2);
+
 	g_skeleton->renderSkeleton();
 
 	// Disable flags for cleanup (optional)
@@ -520,7 +535,8 @@ int main(int argc, char **argv) {
 	glutAddMenuEntry("Stop", STOP);
 	glutAddMenuEntry("Rewind", REWIND);
 	glutAddMenuEntry("Fast Forward", FAST_FORWARD);
-	glutAttachMenu(GLUT_RIGHT_BUTTON);
+	glutAddMenuEntry("Fast Rewind", FAST_REWIND);
+	glutAttachMenu(GLUT_MIDDLE_BUTTON);
 
 	// Create a light on the camera
 	initLight();
@@ -534,28 +550,7 @@ int main(int argc, char **argv) {
 	g_skeleton = new Skeleton(argv[1]);
 
 	if(argc == 3) {
-		// g_skeleton->readAMC(argv[2]);
-
-		ifstream file(argv[2]);
-
-		if (!file.is_open()) {
-			cerr << "Failed to open file " <<  filename << endl;
-			throw runtime_error("Error :: could not open file.");
-		}
-
-		cout << "Reading file" << filename << endl;
-
-		// good() means that failbit, badbit and eofbit are all not set
-		while (file.good()) {
-
-			// Pull out line from file
-			string line = nextLineTrimmed(file);
-
-			cout << line << endl;
-
-		}
-
-		cout << "Completed reading file" << filename << endl;
+		g_skeleton->readConfig(argv[2]);
 	}
 
 
