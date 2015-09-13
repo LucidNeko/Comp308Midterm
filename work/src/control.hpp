@@ -50,4 +50,8 @@ class Control {
 		Spline* projectOnXZPlane();
 
 		comp308::vec3 getUniformPoint(float t);
+
+		bool hasAnimation() {
+			return m_splinePath->size() >= 2 && m_splineSpeed->size() >= 2;
+		}
 };

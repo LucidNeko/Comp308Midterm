@@ -263,7 +263,7 @@ public:
 	}
 
 	void lerpPosition(float x, float y, float z) {
-		float t = 0.1f;
+		float t = 0.4f;
 		comp308::vec3 a = (&m_bones[findBone("root")])->xf.p;
 		comp308::vec3 b = comp308::vec3(x, y, z);
 

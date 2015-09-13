@@ -41,7 +41,7 @@ bool g_isAlt = false;
 
 // Projection values
 // 
-float g_fovy = 20.0;
+float g_fovy = 100.0;
 float g_znear = 0.1;
 float g_zfar = 1000.0;
 
@@ -56,7 +56,7 @@ vec2 g_rightMousePos;
 
 float g_yRotation = 0;
 float g_xRotation = 0;
-float g_zoomFactor = 1.0;
+// float g_zoomFactor = 1.0;
 
 //Menu
 //
@@ -181,7 +181,8 @@ void setUpCamera() {
 
 	// Load camera transforms
 
-	glTranslatef(0.f, 0.f, -5 * g_zoomFactor);
+	// glTranslatef(0.f, 0.f, -5 * g_zoomFactor);
+	glTranslatef(0,0, -1.2f);
 	glRotatef(g_xRotation, 1, 0, 0);
 	glRotatef(g_yRotation, 0, 1, 0);
 	// glTranslatef(g_pan.x, -g_pan.y, -5 * g_zoomFactor);
@@ -273,15 +274,22 @@ void draw() {
 	}
 
 	// float mod_t2 = g_control->modWithSpeed(t+0.01f);
-	vec3 v2 = s->getUniformPoint(mod_t + 0.01f);
-	float sum2 = v2.x + v2.y;
-	if(sum2 == sum2) {
-		if(mod_t + 0.01f > 1) {
-			//if look at would be off the end
-			g_skeleton->lookAt(v); 
-		} else {
-			g_skeleton->lookAt(v2);
+
+	//lookat
+	if(g_control->hasAnimation()) {
+		vec3 v2 = s->getUniformPoint(mod_t + 0.01f);
+		float sum2 = v2.x + v2.y;
+		if(sum2 == sum2) {
+			if(mod_t + 0.01f > 1) {
+				//if look at would be off the end
+				g_skeleton->lookAt(v); 
+			} else {
+				g_skeleton->lookAt(v2);
+			}
 		}
+	} else {
+		//makes sure skeleton has no rotation if not animating
+		g_skeleton->lookAt(vec3(0,0,1)); 
 	}
 
 	//cleanup
@@ -402,7 +410,7 @@ void keyboardCallback(unsigned char key, int x, int y) {
 // Called once per button state change
 //
 void specialCallback(int key, int x, int y) {
-	cout << "Special Callback :: key=" << key << ", x,y=(" << x << "," << y << ")" << endl;
+	// cout << "Special Callback :: key=" << key << ", x,y=(" << x << "," << y << ")" << endl;
 	// Not needed for this assignment, but useful to have later on
 	switch(key) {
 		case 114 : //left ctrl
@@ -530,13 +538,17 @@ void mouseCallback(int button, int state, int x, int y) {
 				g_rightMousePos = vec2(x, y);
 				break;
 			case 3: //scroll foward/up
-				g_zoomFactor /= 1.1;
+				// g_zoomFactor /= 1.1;
+				g_fovy /= 1.02;
 				break;
 
 			case 4: //scroll back/down
-				g_zoomFactor *= 1.1;
+				// g_zoomFactor *= 1.1;
+				g_fovy *= 1.02;
 				break;
 		}
+		if(g_fovy > 160) { g_fovy = 160; }
+		cout << g_fovy << endl;
 	}
 }
 
@@ -582,8 +594,8 @@ int main(int argc, char **argv) {
 		cout << "ASF filename expected" << endl << "    ./a2 priman.asf" << endl;
 		abort(); // Unrecoverable error
 	} else if (argc > 3) {
-		cout << "Too many arguments, expected only ASF and AMC filenames" << endl;
-		cout << "    ./a2 priman.asf priman.amc" << endl;
+		cout << "Too many arguments, expected only ASF and config filenames" << endl;
+		cout << "    ./a2 priman.asf walk.cfg" << endl;
 		abort(); // Unrecoverable error
 	}
 

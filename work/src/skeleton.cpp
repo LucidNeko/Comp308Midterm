@@ -864,11 +864,11 @@ void Skeleton::writeBone(ofstream *file, bone *b) {
 	vec3 t = b->translation;
 	vec3 r = b->rotation;
 
-	cout << b->name << " " << int(b->freedom)<<  " " << int(dof_none) << endl;
+	// cout << b->name << " " << int(b->freedom)<<  " " << int(dof_none) << endl;
 
 	if(b->freedom == int(dof_none)) {
 		//don't write
-		cout << " not writing" << endl;
+		// cout << " not writing" << endl;
 	} else {
 		(*file) << b->name;
 
@@ -907,7 +907,7 @@ void Skeleton::writeBone(ofstream *file, bone *b) {
 }
 
 void Skeleton::displayFrame(uint i) {
-	cout << i << " " << m_frames.size() << endl;
+	// cout << i << " " << m_frames.size() << endl;
 	if(i < m_frames.size()) {
 		renderFrame(&m_frames[i]);
 	}

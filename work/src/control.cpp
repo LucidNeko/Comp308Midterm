@@ -211,6 +211,11 @@ vec3 Control::getUniformPoint(float t) {
 	// 	delete s;
 	// }
 
+	// vec3 v = m_normalizedSplineSpeed->getInterpolatedPoint(t);
+
+	// return m_splinePath->getUniformPoint(L);
+
+
 	return m_splinePath->getUniformPoint(m_normalizedSplineSpeed->getInterpolatedPoint(t).y);
 
 	// return m_splinePath->getUniformPoint(t);
