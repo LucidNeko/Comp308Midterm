@@ -32,6 +32,19 @@ class Control {
 		void render();
 		void clear();
 
+		Spline* getNormalizedSpeedSpline() {
+			return m_normalizedSplineSpeed;
+		}
+
+		Spline* getSpeedSpline() {
+			return m_splineSpeed;
+		}
+
+		Spline* getSplinePath() {
+			return m_splinePath;
+
+		}
+
 		float modWithSpeed(float t);
 
 		Spline* projectOnXZPlane();

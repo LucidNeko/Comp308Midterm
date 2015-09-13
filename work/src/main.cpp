@@ -244,10 +244,76 @@ void draw() {
 	}
 	g_time += 0.01f;
 
+	//get path
+	Spline *s = g_control->projectOnXZPlane();
 
-	// g_skeleton->setPosition(t*2,t*2,t*2);
+	//draw path
+	glColor3f(0.89f, 0.f, 0.f);
+	glBegin(GL_LINES);
+	vec3 a = s->getUniformPoint(0);
+	for(int i = 1; i <= 1000; i++) {
+		vec3 b = s->getUniformPoint(float(i)/1000);
+		glVertex3f(a.x, a.y, a.z);
+		glVertex3f(b.x, b.y, b.z);
+		a = b;
+	}
+	glEnd();
+
+	//get player point on spline
+	float mod_t = g_control->modWithSpeed(t);
+	vec3 v = s->getUniformPoint(mod_t);
+	g_skeleton->setPosition(v.x, v.y, v.z);
+
+	//cleanup
+	delete s;
 
 	g_skeleton->renderSkeleton();
+
+	Spline* c_path = g_control->getSplinePath();
+	Spline* c_spath = g_control->getSpeedSpline();
+	Spline* c_snpath = g_control->getNormalizedSpeedSpline();
+
+	float dt = t;
+
+	vec3 c_spath_point = c_spath->getInterpolatedPoint(dt);
+	vec3 c_snpath_point = c_snpath->getInterpolatedPoint(dt);
+	vec3 c_path_point = c_path->getUniformPoint(c_snpath_point.y);
+	vec3 c_asd = c_spath->getUniformPoint(c_snpath_point.y);
+
+	//enter 2D mode
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, g_winWidth, 0, g_winHeight, -1, 1);
+
+	//enter render mode
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glColor3f(0.2f, 0.8f, 0.2f);
+	drawShape(c_spath_point.x, c_spath_point.y, 6, 4);
+	glColor3f(0.5f, 0.8f, 0.5f);
+	drawShape(c_path_point.x, c_path_point.y, 12, 8);
+	drawShape(c_asd.x, c_asd.y, 12, 8);
+
+	// if(c_spath->size() > 1) {
+	// 	float minX = c_spath->getControlPoint(0).x;
+	// 	float maxX = c_spath->getControlPoint(c_spath->size()-1).x;
+
+	// 	float x = dt*maxX + (1-dt)*minX;
+
+	// 	glBegin(GL_LINES);
+	// 		glVertex2f(x, 0);
+	// 		glVertex2f(x, g_winHeight);
+	// 	glEnd();
+	// }
+
+	glPopMatrix();
+
+	//exit 2D mode
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
 
 	// Disable flags for cleanup (optional)
 	glDisable(GL_DEPTH_TEST);

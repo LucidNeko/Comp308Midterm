@@ -68,10 +68,26 @@ void Control::clear() {
 void Control::onClick(int x, int y) {
 	if(m_speedBox.contains(x, y)) {
 		//in speed
-		m_splineSpeed->addPoint(vec3(x, y, 0));
+		if(m_splineSpeed->size() == 0) {
+			m_splineSpeed->addPoint(vec3(x, y, 0));
 
-		//extract the normalized spline
-		m_splineSpeed->getNormalizedSpline(*m_normalizedSplineSpeed);
+			//extract the normalized spline
+			m_splineSpeed->getNormalizedSpline(*m_normalizedSplineSpeed);
+		} else {
+			vec3 last = m_splineSpeed->getControlPoint(m_splineSpeed->size()-1);
+			if(last.x < x && last.y < y) {
+				//add
+				m_splineSpeed->addPoint(vec3(x, y, 0));
+
+				//extract the normalized spline
+				m_splineSpeed->getNormalizedSpline(*m_normalizedSplineSpeed);
+			}
+		}
+
+		// m_splineSpeed->addPoint(vec3(x, y, 0));
+
+		// //extract the normalized spline
+		// m_splineSpeed->getNormalizedSpline(*m_normalizedSplineSpeed);
 
 		// cout << "x:" << x << " y:" << y << " speed" << endl;
 	} else if(m_pathBox.contains(x, y)) {
@@ -213,5 +229,5 @@ Spline* Control::projectOnXZPlane() {
 }
 
 float Control::modWithSpeed(float t) {
-	return m_normalizedSplineSpeed->getUniformPoint(t).y;
+	return m_normalizedSplineSpeed->getInterpolatedPoint(t).y;
 }

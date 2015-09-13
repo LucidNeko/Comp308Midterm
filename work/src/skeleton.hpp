@@ -254,4 +254,11 @@ public:
 	void setPosition(float x, float y, float z) {
 		(&m_bones[findBone("root")])->translation = comp308::vec3(x, y, z);
 	}
+
+	void lookAt(comp308::vec3 look) {
+		comp308::vec3 pos = (&m_bones[findBone("root")])->translation;
+		comp308::vec3 diff = look-pos; diff.y = 0; //XZ plane
+		comp308::vec3 dir = normalize(diff);
+		comp308::vec3 zvec = comp308::vec3(0,0,1);
+	}
 };
