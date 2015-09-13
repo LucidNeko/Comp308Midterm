@@ -12,8 +12,6 @@
 using namespace std;
 using namespace comp308;
 
-//
-
 Spline::Spline() {
 
 }
@@ -79,6 +77,7 @@ vec3 Spline::getControlPoint(uint n) {
 }
 
 //get a spline point
+//credit Radu Gruian @ codeproject.com
 vec3 Spline::getInterpolatedPoint(float t) {
 	if(size() == 0) {
 		// cout << "Spline has no points, cannot getInterpolatedPoint" << endl;
@@ -169,7 +168,7 @@ float Spline::arcLength() {
 	return m_arcLength;
 }
 
-
+//credit Radu Gruian @ codeproject.com
 vec3 Spline::solve(float t, const vec3& p1, 
 	const vec3& p2, const vec3& p3, const vec3& p4) {
 		float t2 = t * t;
