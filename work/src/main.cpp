@@ -262,7 +262,23 @@ void draw() {
 	//get player point on spline
 	float mod_t = g_control->modWithSpeed(t);
 	vec3 v = s->getUniformPoint(mod_t);
-	g_skeleton->setPosition(v.x, v.y, v.z);
+
+	float sum = v.x + v.y;
+	if(sum == sum) { //checknan
+		g_skeleton->setPosition(v.x, v.y, v.z);
+	}
+
+	// float mod_t2 = g_control->modWithSpeed(t+0.01f);
+	vec3 v2 = s->getUniformPoint(mod_t + 0.01f);
+	float sum2 = v2.x + v2.y;
+	if(sum2 == sum2) {
+		if(mod_t + 0.01f > 1) {
+			//if look at would be off the end
+			g_skeleton->lookAt(v); 
+		} else {
+			g_skeleton->lookAt(v2);
+		}
+	}
 
 	//cleanup
 	delete s;
@@ -278,6 +294,7 @@ void draw() {
 	vec3 c_spath_point = c_spath->getInterpolatedPoint(dt);
 	vec3 c_snpath_point = c_snpath->getInterpolatedPoint(dt);
 	vec3 c_path_point = c_path->getUniformPoint(c_snpath_point.y);
+	vec3 c_path_point_plus = c_path->getUniformPoint(c_snpath_point.y+0.01f);
 	vec3 c_asd = c_spath->getUniformPoint(c_snpath_point.y);
 
 	//enter 2D mode
@@ -295,6 +312,7 @@ void draw() {
 	drawShape(c_spath_point.x, c_spath_point.y, 6, 4);
 	glColor3f(0.5f, 0.8f, 0.5f);
 	drawShape(c_path_point.x, c_path_point.y, 12, 8);
+	drawShape(c_path_point_plus.x, c_path_point_plus.y, 12, 8);
 	drawShape(c_asd.x, c_asd.y, 12, 8);
 
 	// if(c_spath->size() > 1) {

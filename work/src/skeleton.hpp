@@ -256,9 +256,20 @@ public:
 	}
 
 	void lookAt(comp308::vec3 look) {
+
+
 		comp308::vec3 pos = (&m_bones[findBone("root")])->translation;
+
+		if(look.x == pos.x && look.y == pos.y && look.z == pos.z) {
+			return;
+		}
+
 		comp308::vec3 diff = look-pos; diff.y = 0; //XZ plane
 		comp308::vec3 dir = normalize(diff);
 		comp308::vec3 zvec = comp308::vec3(0,0,1);
+		float angle = acos(dot(zvec, dir)/(length(dir)*length(zvec)));
+		angle = comp308::degrees(angle);
+		std::cout << dir.x << " " << angle << std::endl;
+		(&m_bones[findBone("root")])->rotation.y = dir.x < 0 ? -angle : angle;
 	}
 };
